@@ -25,7 +25,6 @@ import { ArrowLeft, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
 
 const signupSchema = z
   .object({
@@ -67,7 +66,7 @@ export default function SignupPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-4">
+      <main className="flex min-h-screen items-center justify-center p-4">
         <p>Loading...</p>
       </main>
     );
@@ -75,12 +74,15 @@ export default function SignupPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
-      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
-      <Link href="/" passHref className="absolute top-4 left-4">
-        <Button variant="ghost">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
-        </Button>
-      </Link>
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+
+      <Button asChild variant="ghost" className="absolute top-4 left-4">
+        <Link href="/">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Home
+        </Link>
+      </Button>
+
       <Card className="w-full max-w-sm shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
@@ -129,7 +131,8 @@ export default function SignupPage() {
                 )}
               />
               <Button type="submit" className="w-full" size="lg">
-                <UserPlus className="mr-2 h-4 w-4" /> Create Account
+                <UserPlus className="mr-2 h-4 w-4" />
+                Create Account
               </Button>
             </form>
           </Form>

@@ -149,11 +149,13 @@ export default function DashboardPage() {
             <p className="text-muted-foreground">Welcome back, {user.email}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/profile" >
-              <Button asChild variant="outline">
-                <User className="mr-2 h-4 w-4" /> Profile
-              </Button>
-            </Link>
+            <Button asChild variant="outline">
+              <Link href="/profile">
+                <span className="flex items-center">
+                  <User className="mr-2 h-4 w-4" /> Profile
+                </span>
+              </Link>
+            </Button>
 
             <Button variant="outline" onClick={() => { logout(); router.push('/'); }}>
               <LogOut className="mr-2 h-4 w-4" /> Logout
@@ -167,11 +169,13 @@ export default function DashboardPage() {
               <CardTitle>Your Wallets</CardTitle>
               <CardDescription>Here are the wallets you have saved.</CardDescription>
             </div>
-            <Link href="/generate-wallet">
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" /> Create New Wallet
-              </Button>
-            </Link>
+            <Button asChild>
+              <Link href="/generate-wallet">
+                <span className="flex items-center">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Create New Wallet
+                </span>
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             {wallets.length > 0 ? (
@@ -222,6 +226,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      {/* View Wallet Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={resetViewDialogState}>
         <DialogContent className="sm:max-w-[625px]">
           {!showDetails ? (

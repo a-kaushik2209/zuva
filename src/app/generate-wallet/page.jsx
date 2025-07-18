@@ -17,11 +17,11 @@ export default function GenerateWalletPage() {
       router.push("/login");
     }
   }, [user, loading, router]);
-  
+
   if (loading || !user) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
-        <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
+        <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
         <p>Loading...</p>
       </main>
     );
@@ -29,14 +29,14 @@ export default function GenerateWalletPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12 bg-background">
-      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
       <div className="w-full max-w-5xl">
         <header className="relative flex justify-start mb-8 h-10 items-center">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="absolute left-0">
+          <Button variant="ghost" className="absolute left-0" asChild>
+            <Link href="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </header>
         <WalletManager />
       </div>
