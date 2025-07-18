@@ -26,51 +26,61 @@ export default function ProfilePage() {
 
   if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-4">
-        <p>Loading...</p>
+      <main className="flex min-h-screen items-center justify-center p-4 bg-background">
+        <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+        <p className="text-base sm:text-lg text-muted-foreground">Loading...</p>
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12">
+    <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12 bg-background">
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+      
       <div className="w-full max-w-md relative">
         <Button
           variant="ghost"
-          className="absolute top-0 left-0"
+          className="absolute -top-2 sm:-top-4 left-0 transition-colors"
           asChild
         >
           <Link href="/dashboard">
             <span className="flex items-center">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
+              <span className="sm:hidden">Back</span>
             </span>
           </Link>
         </Button>
 
-        <Card className="mt-20">
-          <CardHeader>
-            <CardTitle className="text-3xl font-headline">Your Profile</CardTitle>
-            <CardDescription>View and manage your account details.</CardDescription>
+        <Card className="mt-16 sm:mt-20 shadow-lg">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-2xl sm:text-3xl font-headline tracking-tight">
+              Your Profile
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base">
+              View and manage your account details.
+            </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <h4 className="font-semibold">Email</h4>
-              <p className="text-muted-foreground">{user.email}</p>
+          <CardContent className="space-y-6 sm:space-y-8">
+            <div className="space-y-2 sm:space-y-3">
+              <h4 className="text-sm font-medium sm:text-base">Email</h4>
+              <p className="text-sm sm:text-base text-muted-foreground px-3 py-2 bg-muted/50 rounded-md">
+                {user.email}
+              </p>
             </div>
 
             <Button
               variant="destructive"
-              className="w-full"
+              className="w-full h-11 sm:h-12 transition-all hover:opacity-90"
               onClick={() => {
                 logout();
                 router.push("/");
               }}
             >
               <span className="flex items-center justify-center">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log Out
+                <LogOut className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-base">Log Out</span>
               </span>
             </Button>
           </CardContent>

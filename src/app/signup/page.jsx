@@ -73,53 +73,73 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-background">
+      {/* Background Pattern */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
 
+      {/* Back Button */}
       <Button
         variant="ghost"
-        className="absolute top-4 left-4"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-8 lg:left-8"
         asChild
       >
         <Link href="/">
           <span className="flex items-center">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
+            <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
           </span>
         </Link>
       </Button>
 
+      {/* Main Card */}
       <Card className="w-full max-w-sm shadow-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
-          <CardDescription>Get started with your secure wallet manager.</CardDescription>
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl sm:text-3xl font-headline tracking-tight">
+            Create an Account
+          </CardTitle>
+          <CardDescription className="text-sm sm:text-base">
+            Get started with your secure wallet manager.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
+              {/* Email Field */}
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm font-medium">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
+                      <Input 
+                        placeholder="name@example.com" 
+                        className="h-11" 
+                        {...field} 
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
+              
+              {/* Password Fields */}
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm font-medium">Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        className="h-11" 
+                        {...field} 
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
@@ -127,26 +147,42 @@ export default function SignupPage() {
                 control={form.control}
                 name="confirmPassword"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        className="h-11" 
+                        {...field} 
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" size="lg">
-                <span className="flex items-center">
-                  <UserPlus className="mr-2 h-4 w-4" />
+
+              {/* Submit Button */}
+              <Button 
+                type="submit" 
+                className="w-full h-11 sm:h-12 mt-2 transition-all" 
+                size="lg"
+              >
+                <span className="flex items-center justify-center">
+                  <UserPlus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Create Account
                 </span>
               </Button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
+
+          {/* Login Link */}
+          <div className="mt-6 text-center text-sm sm:text-base">
             Already have an account?{" "}
-            <Link href="/login" className="underline font-medium text-primary">
+            <Link 
+              href="/login" 
+              className="underline font-medium text-primary hover:text-primary/80 transition-colors"
+            >
               Login
             </Link>
           </div>

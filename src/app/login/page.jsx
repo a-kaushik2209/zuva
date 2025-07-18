@@ -60,45 +60,60 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-4">
-        <p>Loading...</p>
+      <main className="flex min-h-screen items-center justify-center p-4 bg-background">
+        <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+        <p className="text-base sm:text-lg text-muted-foreground">Loading...</p>
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-background">
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
 
-      <Button variant="ghost" className="absolute top-4 left-4" asChild>
+      <Button
+        variant="ghost"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-8 lg:left-8 transition-colors"
+        asChild
+      >
         <Link href="/">
           <span className="flex items-center">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
+            <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Back</span>
           </span>
         </Link>
       </Button>
 
       <Card className="w-full max-w-sm shadow-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-headline">Welcome Back</CardTitle>
-          <CardDescription>
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl sm:text-3xl font-headline tracking-tight">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="text-sm sm:text-base">
             Enter your credentials to access your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 sm:space-y-5"
+            >
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm font-medium">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
+                      <Input
+                        placeholder="name@example.com"
+                        className="h-11"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
@@ -106,26 +121,38 @@ export default function LoginPage() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm font-medium">Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        className="h-11"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" size="lg">
-                <span className="flex items-center">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Login
+              <Button
+                type="submit"
+                className="w-full h-11 sm:h-12 transition-all"
+                size="lg"
+              >
+                <span className="flex items-center justify-center">
+                  <LogIn className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-base">Login</span>
                 </span>
               </Button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-6 text-center text-sm sm:text-base">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline font-medium text-primary">
+            <Link
+              href="/signup"
+              className="underline font-medium text-primary hover:text-primary/80 transition-colors"
+            >
               Sign up
             </Link>
           </div>
