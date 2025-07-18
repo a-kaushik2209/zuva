@@ -151,16 +151,16 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <Button asChild variant="outline">
               <Link href="/profile">
-                <div className="flex items-center">
+                <span className="flex items-center">
                   <User className="mr-2 h-4 w-4" /> Profile
-                </div>
+                </span>
               </Link>
             </Button>
 
             <Button variant="outline" onClick={() => { logout(); router.push('/'); }}>
-              <div className="flex items-center">
+              <span className="flex items-center">
                 <LogOut className="mr-2 h-4 w-4" /> Logout
-              </div>
+              </span>
             </Button>
           </div>
         </header>
@@ -173,9 +173,9 @@ export default function DashboardPage() {
             </div>
             <Button asChild>
               <Link href="/generate-wallet">
-                <div className="flex items-center">
+                <span className="flex items-center">
                   <PlusCircle className="mr-2 h-4 w-4" /> Create New Wallet
-                </div>
+                </span>
               </Link>
             </Button>
           </CardHeader>
@@ -206,14 +206,14 @@ export default function DashboardPage() {
                         <TableCell>{new Date(wallet.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={() => handleViewClick(wallet)}>
-                            <div className="flex items-center">
+                            <span className="flex items-center">
                               <View className="mr-2 h-4 w-4" /> View
-                            </div>
+                            </span>
                           </Button>
                           <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(wallet)}>
-                            <div className="flex items-center">
+                            <span className="flex items-center">
                               <Trash2 className="mr-2 h-4 w-4" /> Delete
-                            </div>
+                            </span>
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -272,9 +272,9 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-muted-foreground font-mono break-all flex-1 p-2 bg-muted/50 rounded-md">{selectedWallet.publicKey}</p>
                       <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(selectedWallet.publicKey, 'Public Key')}>
-                        <div className="flex items-center">
+                        <span className="flex items-center">
                           <Copy className="h-4 w-4" />
-                        </div>
+                        </span>
                       </Button>
                     </div>
                   </div>

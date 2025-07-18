@@ -72,10 +72,10 @@ export default function LoginPage() {
 
       <Button variant="ghost" className="absolute top-4 left-4" asChild>
         <Link href="/">
-          <div className="flex items-center">
+          <span className="flex items-center">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
-          </div>
+          </span>
         </Link>
       </Button>
 
@@ -116,7 +116,10 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full" size="lg">
-                <LogIn className="mr-2 h-4 w-4" /> Login
+                <span className="flex items-center">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Login
+                </span>
               </Button>
             </form>
           </Form>

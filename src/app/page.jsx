@@ -26,10 +26,10 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
           <Button asChild size="lg" className="w-full sm:w-auto shadow-lg shadow-primary/20">
             <Link href="/generate-wallet">
-              <div className="flex items-center">
+              <span className="flex items-center">
                 <KeyRound className="mr-2"/>
                 Create Your First Wallet
-              </div>
+              </span>
             </Link>
           </Button>
           
@@ -38,19 +38,19 @@ export default function Home() {
               {user ? (
                 <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
                   <Link href="/dashboard">
-                    <div className="flex items-center">
+                    <span className="flex items-center">
                       <User className="mr-2"/>
                       Go to Dashboard
-                    </div>
+                    </span>
                   </Link>
                 </Button>
               ) : (
                 <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
                   <Link href="/login">
-                    <div className="flex items-center">
+                    <span className="flex items-center">
                       <LogIn className="mr-2"/>
                       Login / Sign Up
-                    </div>
+                    </span>
                   </Link>
                 </Button>
               )}

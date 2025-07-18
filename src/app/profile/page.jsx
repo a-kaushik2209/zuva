@@ -41,10 +41,10 @@ export default function ProfilePage() {
           asChild
         >
           <Link href="/dashboard">
-            <div className="flex items-center">
+            <span className="flex items-center">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
-            </div>
+            </span>
           </Link>
         </Button>
 
@@ -62,14 +62,16 @@ export default function ProfilePage() {
 
             <Button
               variant="destructive"
-              className="w-full flex items-center justify-center"
+              className="w-full"
               onClick={() => {
                 logout();
                 router.push("/");
               }}
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Log Out
+              <span className="flex items-center justify-center">
+                <LogOut className="mr-2 h-4 w-4" />
+                Log Out
+              </span>
             </Button>
           </CardContent>
         </Card>
