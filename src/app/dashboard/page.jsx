@@ -158,7 +158,9 @@ export default function DashboardPage() {
             </Button>
 
             <Button variant="outline" onClick={() => { logout(); router.push('/'); }}>
-              <LogOut className="mr-2 h-4 w-4" /> Logout
+              <div className="flex items-center">
+                <LogOut className="mr-2 h-4 w-4" /> Logout
+              </div>
             </Button>
           </div>
         </header>
@@ -204,10 +206,14 @@ export default function DashboardPage() {
                         <TableCell>{new Date(wallet.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={() => handleViewClick(wallet)}>
-                            <View className="mr-2 h-4 w-4" /> View
+                            <div className="flex items-center">
+                              <View className="mr-2 h-4 w-4" /> View
+                            </div>
                           </Button>
                           <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(wallet)}>
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            <div className="flex items-center">
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </div>
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -266,7 +272,9 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-muted-foreground font-mono break-all flex-1 p-2 bg-muted/50 rounded-md">{selectedWallet.publicKey}</p>
                       <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(selectedWallet.publicKey, 'Public Key')}>
-                        <Copy className="h-4 w-4" />
+                        <div className="flex items-center">
+                          <Copy className="h-4 w-4" />
+                        </div>
                       </Button>
                     </div>
                   </div>

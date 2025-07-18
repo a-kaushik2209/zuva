@@ -76,7 +76,11 @@ export default function SignupPage() {
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
 
-      <Button asChild variant="ghost" className="absolute top-4 left-4">
+      <Button
+        variant="ghost"
+        className="absolute top-4 left-4"
+        asChild
+      >
         <Link href="/">
           <div className="flex items-center">
             <ArrowLeft className="mr-2 h-4 w-4" />

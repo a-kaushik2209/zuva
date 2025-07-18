@@ -58,37 +58,6 @@ export default function Home() {
           )}
         </div>
       </div>
-      <div className="w-full max-w-5xl mt-24 sm:mt-32 z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-          <Card className="bg-card/50 border-border/30">
-            <CardHeader>
-              <Lock className="h-8 w-8 text-primary mb-2"/>
-              <CardTitle className="font-headline text-2xl">Unyielding Security</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Your privacy is paramount. Wallets are generated directly on your device, ensuring that your private keys never leave your browser. You are in absolute control of your assets, always.</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/50 border-border/30">
-            <CardHeader>
-              <Sprout className="h-8 w-8 text-primary mb-2"/>
-              <CardTitle className="font-headline text-2xl">Intuitive by Design</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">We believe crypto should be accessible to everyone. Zuva's clean, professional interface simplifies wallet creation and management, removing the complexity so you can focus on what matters.</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/50 border-border/30">
-            <CardHeader>
-              <Network className="h-8 w-8 text-primary mb-2"/>
-              <CardTitle className="font-headline text-2xl">Multi-Chain Ready</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Seamlessly manage assets across leading blockchains. Zuva provides the tools you need to interact with a diverse ecosystem of dApps and protocols, starting with Ethereum and Solana.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
     </main>
   );
 }

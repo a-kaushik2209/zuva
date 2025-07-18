@@ -62,16 +62,14 @@ export default function ProfilePage() {
 
             <Button
               variant="destructive"
-              className="w-full"
+              className="w-full flex items-center justify-center"
               onClick={() => {
                 logout();
                 router.push("/");
               }}
             >
-              <div className="flex items-center">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log Out
-              </div>
+              <LogOut className="mr-2 h-4 w-4" />
+              Log Out
             </Button>
           </CardContent>
         </Card>
