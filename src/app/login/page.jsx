@@ -21,11 +21,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import { ArrowLeft, LogIn } from "lucide-react";
+import { ArrowLeft, LogIn, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { GoogleButton } from "@/components/ui/google-button";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -33,8 +34,10 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [authError, setAuthError] = useState(null);
   const router = useRouter();
-  const { login, user, loading } = useAuth();
+  const { login, user, loading, signInWithGoogle } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -57,6 +60,77 @@ export default function LoginPage() {
       });
     }
   };
+
+  const handleGoogleLogin = async () => {
+    if (isGoogleLoading) return;
+
+    setIsGoogleLoading(true);
+    setAuthError(null);
+
+    try {
+      const result = await signInWithGoogle();
+
+      if (result) {
+        toast.success("Login Successful", {
+          description: "Redirecting to your dashboard...",
+        });
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      setAuthError(error);
+      switch (error.code) {
+        case "auth/popup-closed-by-user":
+          break;
+
+        case "auth/popup-blocked":
+          toast.error("Popup Blocked", {
+            description: "Please allow popups for this site and try again.",
+            action: {
+              label: "Try Again",
+              onClick: () => handleGoogleLogin(),
+            },
+          });
+          break;
+
+        case "auth/cancelled-popup-request":
+          break;
+
+        case "auth/network-request-failed":
+          toast.error("Connection Failed", {
+            description: "Please check your internet connection and try again.",
+            action: {
+              label: "Retry",
+              onClick: () => handleGoogleLogin(),
+            },
+          });
+          break;
+
+        case "auth/too-many-requests":
+          toast.error("Too Many Attempts", {
+            description: "Please wait a moment before trying again.",
+          });
+          break;
+
+        default:
+          toast.error("Login Failed", {
+            description: "An unexpected error occurred. Please try again later.",
+          });
+          console.error("Google login error:", {
+            code: error.code,
+            message: error.message,
+            fullError: error,
+          });
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user && !loading) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -147,6 +221,39 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-muted"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <GoogleButton
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading || loading}
+            className="relative hover:bg-muted/50"
+          >
+            {isGoogleLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>
+                  {authError?.code === "auth/popup-blocked"
+                    ? "Waiting for popup..."
+                    : "Connecting..."}
+                </span>
+              </span>
+            ) : (
+              <span className="flex items-center justify-center">
+                Continue with Google
+              </span>
+            )}
+          </GoogleButton>
+
           <div className="mt-6 text-center text-sm sm:text-base">
             Don&apos;t have an account?{" "}
             <Link

@@ -166,7 +166,6 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* Card Section */}
         <Card className="shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -234,7 +233,6 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* View Wallet Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={resetViewDialogState}>
         <DialogContent className="sm:max-w-[625px] p-6">
           <div className="space-y-6">
@@ -313,7 +311,6 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Wallet Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="sm:max-w-[500px] p-6">
           <div className="space-y-6">

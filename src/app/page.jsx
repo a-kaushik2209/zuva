@@ -10,18 +10,14 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-8 text-center bg-background relative overflow-hidden">
-      {/* Background gradient */}
       <div className="absolute inset-0 -z-10 h-full w-full animated-gradient"></div>
       
-      {/* Main content container */}
       <div className="w-full max-w-[85rem] mx-auto space-y-8 md:space-y-12 z-10 px-4 sm:px-6 lg:px-8">
-        {/* Badge */}
         <div className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary transform hover:scale-105 transition-transform">
           <ShieldCheck className="mr-2 h-4 w-4" />
           Your Keys, Your Crypto
         </div>
 
-        {/* Hero content */}
         <div className="space-y-6 md:space-y-8">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-headline font-bold tracking-tighter text-primary max-w-[20ch] mx-auto leading-[1.1]">
             Zuva
@@ -31,7 +27,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 w-full max-w-lg mx-auto pt-4">
           <Button 
             asChild 

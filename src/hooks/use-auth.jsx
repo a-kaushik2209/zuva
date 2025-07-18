@@ -1,19 +1,15 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut 
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 const MOCK_PASS_SUFFIX = '_secret';
-
-const createRandomHash = (length) => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
-
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -21,7 +17,20 @@ export function AuthProvider({ children }) {
   const [wallets, setWallets] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Firebase Auth State Monitor
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const userData = {
+          email: firebaseUser.email,
+          isGoogleUser: true
+        };
+        setUser(userData);
+        loadWallets(userData.email);
+      }
+    });
+
+    // Check local storage for existing session
     try {
       const storedUser = localStorage.getItem('zuva-user');
       if (storedUser) {
@@ -34,19 +43,36 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
+
+    return () => unsubscribe();
   }, []);
 
+  // Wallet Management Functions
   const loadWallets = (userEmail) => {
     try {
       const storedWallets = localStorage.getItem(`zuva-wallets-${userEmail}`);
-      if (storedWallets) {
-        setWallets(JSON.parse(storedWallets));
-      } else {
-        setWallets([]);
-      }
+      setWallets(storedWallets ? JSON.parse(storedWallets) : []);
     } catch (error) {
       console.error(error);
       setWallets([]);
+    }
+  };
+
+  // Authentication Functions
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const userData = {
+        email: result.user.email,
+        isGoogleUser: true
+      };
+      setUser(userData);
+      loadWallets(userData.email);
+      return userData;
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      throw error;
     }
   };
 
@@ -55,11 +81,9 @@ export function AuthProvider({ children }) {
       const storedUsers = localStorage.getItem('zuva-users') || '{}';
       const users = JSON.parse(storedUsers);
       
-      if (users[email]) {
-        return null;
-      }
+      if (users[email]) return null;
 
-      const newUser = { email };
+      const newUser = { email, isGoogleUser: false };
       users[email] = { email, password: pass + MOCK_PASS_SUFFIX };
       
       localStorage.setItem('zuva-users', JSON.stringify(users));
@@ -81,7 +105,7 @@ export function AuthProvider({ children }) {
       const userData = users[email];
 
       if (userData && userData.password === pass + MOCK_PASS_SUFFIX) {
-        const loggedInUser = { email };
+        const loggedInUser = { email, isGoogleUser: false };
         localStorage.setItem('zuva-user', JSON.stringify(loggedInUser));
         setUser(loggedInUser);
         loadWallets(email);
@@ -93,33 +117,30 @@ export function AuthProvider({ children }) {
       return null;
     }
   };
-  
-  const verifyPassword = (pass) => {
-    if (!user) return false;
+
+  const logout = async () => {
     try {
-      const storedUsers = localStorage.getItem('zuva-users') || '{}';
-      const users = JSON.parse(storedUsers);
-      const userData = users[user.email];
-      return userData && userData.password === pass + MOCK_PASS_SUFFIX;
+      const currentUser = user;
+      if (currentUser?.isGoogleUser) {
+        await signOut(auth);
+      }
+      localStorage.removeItem('zuva-user');
+      setUser(null);
+      setWallets([]);
     } catch (error) {
-      console.error(error);
-      return false;
+      console.error('Logout error:', error);
+      throw error;
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('zuva-user');
-    setUser(null);
-    setWallets([]);
-  };
-
+  // Wallet Functions
   const addWallet = (wallet) => {
     if (!user) return;
     
     const newWallet = { 
-        ...wallet, 
-        id: `${wallet.chain}-${createRandomHash(4)}`,
-        createdAt: new Date().toISOString() 
+      ...wallet, 
+      id: `${wallet.chain}-${Math.random().toString(36).substr(2, 4)}`,
+      createdAt: new Date().toISOString() 
     };
     const updatedWallets = [...wallets, newWallet];
 
@@ -143,8 +164,32 @@ export function AuthProvider({ children }) {
       console.error(error);
     }
   };
-  
-  const value = { user, wallets, loading, signup, login, logout, addWallet, deleteWallet, verifyPassword };
+
+  const verifyPassword = (pass) => {
+    if (!user || user.isGoogleUser) return false;
+    try {
+      const storedUsers = localStorage.getItem('zuva-users') || '{}';
+      const users = JSON.parse(storedUsers);
+      const userData = users[user.email];
+      return userData && userData.password === pass + MOCK_PASS_SUFFIX;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  const value = {
+    user,
+    wallets,
+    loading,
+    signup,
+    login,
+    logout,
+    signInWithGoogle,
+    addWallet,
+    deleteWallet,
+    verifyPassword
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
