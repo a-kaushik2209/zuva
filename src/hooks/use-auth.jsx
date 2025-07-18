@@ -1,15 +1,16 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  onAuthStateChanged,
+  signInWithPopup, 
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut 
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { createUserDocument, getUserWallets } from '@/lib/firebase-service';
 
-const MOCK_PASS_SUFFIX = '_secret';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -17,165 +18,71 @@ export function AuthProvider({ children }) {
   const [wallets, setWallets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Firebase Auth State Monitor
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
-        const userData = {
-          email: firebaseUser.email,
-          isGoogleUser: true
-        };
-        setUser(userData);
-        loadWallets(userData.email);
+        await createUserDocument(firebaseUser);
+        const userWallets = await getUserWallets(firebaseUser.uid);
+        setWallets(userWallets);
+        setUser(firebaseUser);
+      } else {
+        setUser(null);
+        setWallets([]);
       }
-    });
-
-    // Check local storage for existing session
-    try {
-      const storedUser = localStorage.getItem('zuva-user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        loadWallets(parsedUser.email);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
       setLoading(false);
-    }
+    });
 
     return () => unsubscribe();
   }, []);
 
-  // Wallet Management Functions
-  const loadWallets = (userEmail) => {
+  const signup = async (email, password) => {
     try {
-      const storedWallets = localStorage.getItem(`zuva-wallets-${userEmail}`);
-      setWallets(storedWallets ? JSON.parse(storedWallets) : []);
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      await createUserDocument(result.user);
+      return result.user;
     } catch (error) {
-      console.error(error);
-      setWallets([]);
+      console.error('Signup error:', error);
+      throw error;
     }
   };
 
-  // Authentication Functions
+  const login = async (email, password) => {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      return result.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      const userData = {
-        email: result.user.email,
-        isGoogleUser: true
-      };
-      setUser(userData);
-      loadWallets(userData.email);
-      return userData;
+      await createUserDocument(result.user);
+      return result.user;
     } catch (error) {
       console.error('Google sign in error:', error);
       throw error;
     }
   };
 
-  const signup = (email, pass) => {
-    try {
-      const storedUsers = localStorage.getItem('zuva-users') || '{}';
-      const users = JSON.parse(storedUsers);
-      
-      if (users[email]) return null;
+  const logout = () => signOut(auth);
 
-      const newUser = { email, isGoogleUser: false };
-      users[email] = { email, password: pass + MOCK_PASS_SUFFIX };
-      
-      localStorage.setItem('zuva-users', JSON.stringify(users));
-      localStorage.setItem('zuva-user', JSON.stringify(newUser));
-      setUser(newUser);
-      setWallets([]);
-      
-      return newUser;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
-
-  const login = (email, pass) => {
-    try {
-      const storedUsers = localStorage.getItem('zuva-users') || '{}';
-      const users = JSON.parse(storedUsers);
-      const userData = users[email];
-
-      if (userData && userData.password === pass + MOCK_PASS_SUFFIX) {
-        const loggedInUser = { email, isGoogleUser: false };
-        localStorage.setItem('zuva-user', JSON.stringify(loggedInUser));
-        setUser(loggedInUser);
-        loadWallets(email);
-        return loggedInUser;
-      }
-      return null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      const currentUser = user;
-      if (currentUser?.isGoogleUser) {
-        await signOut(auth);
-      }
-      localStorage.removeItem('zuva-user');
-      setUser(null);
-      setWallets([]);
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
-  };
-
-  // Wallet Functions
-  const addWallet = (wallet) => {
+  const addWallet = async (walletData) => {
     if (!user) return;
     
-    const newWallet = { 
-      ...wallet, 
-      id: `${wallet.chain}-${Math.random().toString(36).substr(2, 4)}`,
-      createdAt: new Date().toISOString() 
-    };
-    const updatedWallets = [...wallets, newWallet];
-
-    try {
-      localStorage.setItem(`zuva-wallets-${user.email}`, JSON.stringify(updatedWallets));
-      setWallets(updatedWallets);
-    } catch (error) {
-      console.error(error);
-    }
+    const newWallet = await addWallet(user.uid, walletData);
+    setWallets([...wallets, newWallet]);
+    return newWallet;
   };
-  
-  const deleteWallet = (walletId) => {
+
+  const deleteWallet = async (walletId) => {
     if (!user) return;
     
-    const updatedWallets = wallets.filter(w => w.id !== walletId);
-    
-    try {
-      localStorage.setItem(`zuva-wallets-${user.email}`, JSON.stringify(updatedWallets));
-      setWallets(updatedWallets);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const verifyPassword = (pass) => {
-    if (!user || user.isGoogleUser) return false;
-    try {
-      const storedUsers = localStorage.getItem('zuva-users') || '{}';
-      const users = JSON.parse(storedUsers);
-      const userData = users[user.email];
-      return userData && userData.password === pass + MOCK_PASS_SUFFIX;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+    await deleteWallet(user.uid, walletId);
+    setWallets(wallets.filter(w => w.id !== walletId));
   };
 
   const value = {
@@ -187,8 +94,7 @@ export function AuthProvider({ children }) {
     logout,
     signInWithGoogle,
     addWallet,
-    deleteWallet,
-    verifyPassword
+    deleteWallet
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
