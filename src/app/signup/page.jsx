@@ -78,10 +78,10 @@ export default function SignupPage() {
 
       <Button asChild variant="ghost" className="absolute top-4 left-4">
         <Link href="/">
-          <span>
-            <ArowLeft className="mr-2 h-4 w-4" />
+          <div className="flex items-center">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
-          </span>
+          </div>
         </Link>
       </Button>
 
@@ -133,8 +133,10 @@ export default function SignupPage() {
                 )}
               />
               <Button type="submit" className="w-full" size="lg">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Create Account
+                <div className="flex items-center">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Create Account
+                </div>
               </Button>
             </form>
           </Form>

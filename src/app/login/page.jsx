@@ -72,9 +72,10 @@ export default function LoginPage() {
 
       <Button variant="ghost" className="absolute top-4 left-4" asChild>
         <Link href="/">
-          <span>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
-          </span>
+          <div className="flex items-center">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </div>
         </Link>
       </Button>
 

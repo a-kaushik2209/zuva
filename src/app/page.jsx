@@ -24,34 +24,35 @@ export default function Home() {
           Welcome to the future of self-custody. Zuva provides a secure, intuitive, and personal gateway to the world of crypto. Generate wallets, manage your assets, and interact with the decentralized web with confidence and complete control.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-          <Link href="/generate-wallet">
-            <Button asChild size="lg" className="w-full sm:w-auto shadow-lg shadow-primary/20">
-              <span>
+          <Button asChild size="lg" className="w-full sm:w-auto shadow-lg shadow-primary/20">
+            <Link href="/generate-wallet">
+              <div className="flex items-center">
                 <KeyRound className="mr-2"/>
                 Create Your First Wallet
-              </span>
-            </Button>
-          </Link>
+              </div>
+            </Link>
+          </Button>
+          
           {!loading && (
             <>
               {user ? (
-                <Link href="/dashboard">
-                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-                    <span>
+                <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                  <Link href="/dashboard">
+                    <div className="flex items-center">
                       <User className="mr-2"/>
                       Go to Dashboard
-                    </span>
-                  </Button>
-                </Link>
+                    </div>
+                  </Link>
+                </Button>
               ) : (
-                <Link href="/login">
-                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-                    <span>
+                <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                  <Link href="/login">
+                    <div className="flex items-center">
                       <LogIn className="mr-2"/>
                       Login / Sign Up
-                    </span>
-                  </Button>
-                </Link>
+                    </div>
+                  </Link>
+                </Button>
               )}
             </>
           )}

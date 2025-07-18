@@ -34,9 +34,10 @@ export default function GenerateWalletPage() {
         <header className="relative flex justify-start mb-8 h-10 items-center">
           <Button variant="ghost" className="absolute left-0" asChild>
             <Link href="/dashboard">
-              <span>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
-              </span>
+              <div className="flex items-center">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Dashboard
+              </div>
             </Link>
           </Button>
         </header>
