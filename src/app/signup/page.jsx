@@ -78,8 +78,10 @@ export default function SignupPage() {
 
       <Button asChild variant="ghost" className="absolute top-4 left-4">
         <Link href="/">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          <span>
+            <ArowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </span>
         </Link>
       </Button>
 

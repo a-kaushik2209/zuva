@@ -25,25 +25,31 @@ export default function Home() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
           <Link href="/generate-wallet">
-            <Button size="lg" className="w-full sm:w-auto shadow-lg shadow-primary/20">
-              <KeyRound className="mr-2"/>
-              Create Your First Wallet
+            <Button asChild size="lg" className="w-full sm:w-auto shadow-lg shadow-primary/20">
+              <span>
+                <KeyRound className="mr-2"/>
+                Create Your First Wallet
+              </span>
             </Button>
           </Link>
           {!loading && (
             <>
               {user ? (
                 <Link href="/dashboard">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    <User className="mr-2"/>
-                    Go to Dashboard
+                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                    <span>
+                      <User className="mr-2"/>
+                      Go to Dashboard
+                    </span>
                   </Button>
                 </Link>
               ) : (
                 <Link href="/login">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    <LogIn className="mr-2"/>
-                    Login / Sign Up
+                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                    <span>
+                      <LogIn className="mr-2"/>
+                      Login / Sign Up
+                    </span>
                   </Button>
                 </Link>
               )}

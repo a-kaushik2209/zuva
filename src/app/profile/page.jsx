@@ -36,12 +36,14 @@ export default function ProfilePage() {
     <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12">
       <div className="w-full max-w-md relative">
         <Link href="/dashboard">
-          <Button
+          <Button asChild
             variant="ghost"
             className="absolute top-0 left-0 flex items-center"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+            <span>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </span>
           </Button>
         </Link>
 
