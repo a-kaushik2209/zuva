@@ -143,6 +143,7 @@ export default function DashboardPage() {
     <main className="flex min-h-screen flex-col items-center p-4 sm:p-8 md:p-12 bg-background">
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
       <div className="w-full max-w-6xl">
+        {/* Header Section */}
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold font-headline tracking-tighter">Dashboard</h1>
@@ -165,6 +166,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
+        {/* Card Section */}
         <Card className="shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -285,10 +287,14 @@ export default function DashboardPage() {
                         {visiblePrivateKey === selectedWallet.id ? selectedWallet.privateKey : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
                       </p>
                       <Button variant="ghost" size="icon" onClick={() => togglePrivateKeyVisibility(selectedWallet.id)}>
-                        {visiblePrivateKey === selectedWallet.id ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <span className="flex items-center">
+                          {visiblePrivateKey === selectedWallet.id ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </span>
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(selectedWallet.privateKey, 'Private Key')}>
-                        <KeyRound className="h-4 w-4" />
+                        <span className="flex items-center">
+                          <KeyRound className="h-4 w-4" />
+                        </span>
                       </Button>
                     </div>
                   </div>

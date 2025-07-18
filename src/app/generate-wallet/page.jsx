@@ -32,7 +32,7 @@ export default function GenerateWalletPage() {
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
       <div className="w-full max-w-5xl">
         <header className="relative flex justify-start mb-8 h-10 items-center">
-          <Button asChild>
+          <Button asChild variant="ghost">
             <Link href="/dashboard">
               <span className="flex items-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
