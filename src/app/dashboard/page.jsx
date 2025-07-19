@@ -26,7 +26,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription as AlertDialogDesc,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -50,20 +50,19 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { useHotkeys } from 'react-hotkeys-hook';
 
 export default function DashboardPage() {
-  const { user, logout, wallets, loading, verifyPassword, deleteWallet } = useAuth();
+  const { user, logout, wallets, loading, deleteWallet } = useAuth();
   const router = useRouter();
 
   const [visiblePrivateKey, setVisiblePrivateKey] = useState(null);
-  const [password, setPassword] = useState('');
-  const [showDetails, setShowDetails] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [walletToDelete, setWalletToDelete] = useState(null);
-  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -87,47 +86,58 @@ export default function DashboardPage() {
     setIsViewDialogOpen(true);
   };
 
-  const handlePasswordSubmit = () => {
-    if (verifyPassword(password)) {
-      setShowDetails(true);
-    } else {
-      toast.error("Incorrect Password", {
-        description: "The password you entered is incorrect.",
+  const handleDeleteClick = (wallet) => {
+    setWalletToDelete(wallet);
+    setDeleteConfirmText('');
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteConfirmText !== 'confirm') {
+      toast.error('Please type "confirm" to delete the wallet');
+      return;
+    }
+
+    try {
+      await deleteWallet(walletToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setWalletToDelete(null);
+      setDeleteConfirmText('');
+      toast.success("Wallet Deleted", {
+        description: `Wallet ${walletToDelete.publicKey.slice(0, 12)}... has been removed.`,
       });
+    } catch (error) {
+      toast.error("Failed to delete wallet");
     }
   };
 
   const resetViewDialogState = () => {
     setIsViewDialogOpen(false);
     setSelectedWallet(null);
-    setPassword('');
-    setShowDetails(false);
     setVisiblePrivateKey(null);
   };
 
-  const handleDeleteClick = (wallet) => {
-    setWalletToDelete(wallet);
-    setIsDeleteDialogOpen(true);
+  // Add handlers for copy operations
+  const handleKeyboardCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to Clipboard");
   };
 
-  const handleDeleteConfirm = () => {
-    if (verifyPassword(deletePassword)) {
-      deleteWallet(walletToDelete.id);
-      toast.success("Wallet Deleted", {
-        description: `Wallet ${walletToDelete.publicKey.slice(0, 12)}... has been removed.`,
-      });
-      resetDeleteDialogState();
-    } else {
-      toast.error("Incorrect Password", {
-        description: "The password you entered is incorrect.",
-      });
+  // Add hotkeys for copying
+  useHotkeys('ctrl+c', () => {
+    if (selectedWallet) {
+      const activeElement = document.activeElement;
+      if (activeElement?.tagName === 'CODE') {
+        handleKeyboardCopy(activeElement.textContent);
+      }
     }
-  };
+  });
 
-  const resetDeleteDialogState = () => {
-    setIsDeleteDialogOpen(false);
-    setWalletToDelete(null);
-    setDeletePassword('');
+  // Add handler for delete dialog submission
+  const handleDeleteKeySubmit = (e) => {
+    if (e.key === 'Enter' && deleteConfirmText === 'confirm') {
+      handleDeleteConfirm();
+    }
   };
 
   if (loading || !user) {
@@ -233,121 +243,124 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Dialog open={isViewDialogOpen} onOpenChange={resetViewDialogState}>
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[625px] p-6">
+          <DialogHeader>
+            <DialogTitle>Wallet Details</DialogTitle>
+            <DialogDescription>
+              View your wallet's public and private keys.
+            </DialogDescription>
+          </DialogHeader>
+          
           <div className="space-y-6">
-            {!showDetails ? (
-              <>
-                <DialogHeader className="space-y-3">
-                  <DialogTitle className="text-2xl font-headline">Verify Your Identity</DialogTitle>
-                  <DialogDescription className="text-base">
-                    For your security, please enter your password to view wallet details.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      className="h-11"
-                      onChange={(e) => setPassword(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
-                    />
-                  </div>
-                  <Button 
-                    onClick={handlePasswordSubmit}
-                    className="w-full h-11 sm:h-12 transition-all"
-                  >
-                    <span className="flex items-center justify-center text-base">
-                      Continue
-                    </span>
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <DialogHeader className="space-y-3">
-                  <DialogTitle className="text-2xl font-headline">Wallet Details</DialogTitle>
-                  <DialogDescription className="text-base">
-                    Manage your public and private keys. Keep your private key secure.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <h4 className="font-semibold">Public Key</h4>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground font-mono break-all flex-1 p-2 bg-muted/50 rounded-md">{selectedWallet.publicKey}</p>
-                      <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(selectedWallet.publicKey, 'Public Key')}>
-                        <span className="flex items-center">
-                          <Copy className="h-4 w-4" />
-                        </span>
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="font-semibold">Private Key</h4>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground font-mono break-all flex-1 p-2 bg-muted/50 rounded-md">
-                        {visiblePrivateKey === selectedWallet.id ? selectedWallet.privateKey : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
-                      </p>
-                      <Button variant="ghost" size="icon" onClick={() => togglePrivateKeyVisibility(selectedWallet.id)}>
-                        <span className="flex items-center">
-                          {visiblePrivateKey === selectedWallet.id ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </span>
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(selectedWallet.privateKey, 'Private Key')}>
-                        <span className="flex items-center">
-                          <KeyRound className="h-4 w-4" />
-                        </span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
+            <div className="space-y-2">
+              <Label>Public Key</Label>
+              <div className="relative flex items-center gap-2">
+                <code 
+                  className="w-full p-3 bg-muted rounded-md font-mono text-sm break-all"
+                  tabIndex={0}
+                  role="textbox"
+                  aria-label="Public Key"
+                >
+                  {selectedWallet?.publicKey}
+                </code>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2"
+                  onClick={() => handleCopyToClipboard(selectedWallet?.publicKey, 'Public Key')}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Private Key</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => togglePrivateKeyVisibility(selectedWallet?.id)}
+                  className="h-8 px-2"
+                >
+                  <span className="flex items-center gap-2">
+                    {visiblePrivateKey === selectedWallet?.id ? (
+                      <>
+                        <EyeOff className="h-4 w-4" />
+                        Hide
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-4 w-4" />
+                        Show
+                      </>
+                    )}
+                  </span>
+                </Button>
+              </div>
+              <div className="relative flex items-center gap-2">
+                <code 
+                  className="w-full p-3 bg-muted rounded-md font-mono text-sm break-all"
+                  tabIndex={0}
+                  role="textbox"
+                  aria-label="Private Key"
+                >
+                  {visiblePrivateKey === selectedWallet?.id 
+                    ? selectedWallet?.privateKey 
+                    : '••••••••••••••••••••••••••••••••'}
+                </code>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2"
+                  onClick={() => handleCopyToClipboard(selectedWallet?.privateKey, 'Private Key')}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
+      {/* Delete Wallet Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="sm:max-w-[500px] p-6">
-          <div className="space-y-6">
-            <AlertDialogHeader className="space-y-3">
-              <AlertDialogTitle className="text-2xl font-headline text-destructive">
-                Are you sure?
-              </AlertDialogTitle>
-              <AlertDialogDesc className="text-base">
-                This action cannot be undone. This will permanently remove the wallet from your saved list. To confirm, please enter your password.
-              </AlertDialogDesc>
-            </AlertDialogHeader>
-            <div className="space-y-2">
-              <Label htmlFor="delete-password" className="text-sm font-medium">Password</Label>
-              <Input
-                id="delete-password"
-                type="password"
-                value={deletePassword}
-                className="h-11"
-                onChange={(e) => setDeletePassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleDeleteConfirm()}
-              />
-            </div>
-            <AlertDialogFooter className="gap-2 sm:gap-3">
-              <AlertDialogCancel 
-                onClick={resetDeleteDialogState}
-                className="h-11 sm:h-12 transition-all"
-              >
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={handleDeleteConfirm} 
-                className="h-11 sm:h-12 bg-destructive hover:bg-destructive/90 transition-all"
-              >
-                Delete Wallet
-              </AlertDialogAction>
-            </AlertDialogFooter>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-headline text-destructive">
+              Delete Wallet
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              This action cannot be undone. Type "confirm" to delete this wallet.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Input
+              placeholder='Type "confirm" to delete'
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              onKeyDown={handleDeleteKeySubmit}
+              className="h-11"
+            />
           </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setDeleteConfirmText('');
+              setIsDeleteDialogOpen(false);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={deleteConfirmText !== 'confirm'}
+            >
+              Delete Wallet
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </main>

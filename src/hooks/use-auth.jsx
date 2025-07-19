@@ -62,16 +62,19 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      // Add these options to handle popup behavior
+      provider.setCustomParameters({
+        prompt: 'select_account',
+        popupType: 'center'
+      });
+
       const result = await signInWithPopup(auth, provider);
-      const userData = {
-        email: result.user.email,
-        isGoogleUser: true
-      };
-      setUser(userData);
-      loadWallets(userData.email);
-      return userData;
+      return result.user;
     } catch (error) {
       console.error('Google sign in error:', error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('Sign-in cancelled');
+      }
       throw error;
     }
   };
