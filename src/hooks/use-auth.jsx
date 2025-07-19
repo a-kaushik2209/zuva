@@ -6,7 +6,9 @@ import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut 
+  signOut,
+  EmailAuthProvider,
+  reauthenticateWithCredential
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { 
@@ -110,6 +112,19 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const verifyPassword = async (password) => {
+    if (!user || user.isGoogleUser) return false;
+    try {
+      // For Firebase users, you might want to use reauthenticateWithCredential
+      const credential = EmailAuthProvider.credential(user.email, password);
+      await reauthenticateWithCredential(user, credential);
+      return true;
+    } catch (error) {
+      console.error('Password verification failed:', error);
+      return false;
+    }
+  };
+
   const value = {
     user,
     wallets,
@@ -119,7 +134,8 @@ export function AuthProvider({ children }) {
     logout,
     signInWithGoogle,
     addWallet,
-    deleteWallet
+    deleteWallet,
+    verifyPassword
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

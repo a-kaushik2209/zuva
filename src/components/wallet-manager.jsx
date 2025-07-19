@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -11,6 +19,7 @@ import { toast } from "sonner";
 import { generateMnemonic, deriveWallets } from "@/lib/crypto";
 import { Copy, Hexagon, Waves, PlusCircle, KeyRound, Eye, EyeOff, Save, AlertTriangle, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function WalletManager() {
@@ -20,8 +29,11 @@ export default function WalletManager() {
   const [visiblePrivateKey, setVisiblePrivateKey] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [walletToDelete, setWalletToDelete] = useState(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const { addWallet } = useAuth();
+  const { addWallet, deleteWallet, verifyPassword } = useAuth();
 
   const handleCopyToClipboard = (text, label) => {
     navigator.clipboard.writeText(text);
@@ -99,6 +111,34 @@ export default function WalletManager() {
 
   const togglePrivateKeyVisibility = (id) => {
     setVisiblePrivateKey(visiblePrivateKey === id ? null : id);
+  };
+
+  const handleDeleteWallet = async (wallet) => {
+    setWalletToDelete(wallet);
+  };
+
+  const confirmDelete = async () => {
+    if (!walletToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const isValid = await verifyPassword(deletePassword);
+      if (!isValid) {
+        toast.error("Invalid password");
+        return;
+      }
+
+      await deleteWallet(walletToDelete.id);
+      toast.success("Wallet deleted successfully");
+      setWalletToDelete(null);
+      setDeletePassword("");
+    } catch (error) {
+      toast.error("Failed to delete wallet", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const ChainSelector = (
@@ -237,6 +277,15 @@ export default function WalletManager() {
                           <span className="sr-only">Save Wallet</span>
                           <Save className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteWallet(wallet)}
+                          title="Delete Wallet"
+                        >
+                          <span className="sr-only">Delete Wallet</span>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -246,6 +295,43 @@ export default function WalletManager() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!walletToDelete} onOpenChange={() => setWalletToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Wallet</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Please enter your password to confirm deletion.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Input
+              type="password"
+              placeholder="Enter your password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={!deletePassword || isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Wallet"
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

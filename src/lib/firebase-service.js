@@ -35,25 +35,6 @@ export async function getUserWallets(userId) {
   }));
 }
 
-export async function addWallet(userId, walletData) {
-  const walletsRef = collection(db, 'users', userId, 'wallets');
-  const newWallet = {
-    ...walletData,
-    createdAt: new Date().toISOString()
-  };
-  
-  const docRef = await addDoc(walletsRef, newWallet);
-  return {
-    id: docRef.id,
-    ...newWallet
-  };
-}
-
-export async function deleteWallet(userId, walletId) {
-  const walletRef = doc(db, 'users', userId, 'wallets', walletId);
-  await deleteDoc(walletRef);
-}
-
 export async function addWalletToUser(userId, walletData) {
   try {
     const walletsRef = collection(db, 'users', userId, 'wallets');
@@ -73,7 +54,30 @@ export async function addWalletToUser(userId, walletData) {
   }
 }
 
+export async function deleteWalletFromUser(userId, walletId) {
+  try {
+    if (!userId || !walletId) {
+      throw new Error('User ID and Wallet ID are required');
+    }
+
+    const walletRef = doc(db, 'users', userId, 'wallets', walletId);
+    const walletSnap = await getDoc(walletRef);
+    
+    if (!walletSnap.exists()) {
+      throw new Error('Wallet not found');
+    }
+
+    await deleteDoc(walletRef);
+    return true;
+  } catch (error) {
+    console.error('Error deleting wallet:', error);
+    throw error;
+  }
+}
+
 export function subscribeToWallets(userId, callback) {
+  if (!userId) return () => {}; // Return empty cleanup function if no userId
+
   const walletsRef = collection(db, 'users', userId, 'wallets');
   return onSnapshot(walletsRef, (snapshot) => {
     const wallets = snapshot.docs.map(doc => ({
@@ -81,16 +85,8 @@ export function subscribeToWallets(userId, callback) {
       ...doc.data()
     }));
     callback(wallets);
+  }, (error) => {
+    console.error('Error in wallet subscription:', error);
+    callback([]); // Return empty array on error
   });
-}
-
-export async function deleteWalletFromUser(userId, walletId) {
-  try {
-    const walletRef = doc(db, 'users', userId, 'wallets', walletId);
-    await deleteDoc(walletRef);
-    return true;
-  } catch (error) {
-    console.error('Error deleting wallet:', error);
-    throw error;
-  }
 }
