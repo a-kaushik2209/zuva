@@ -106,8 +106,10 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      await deleteWalletFromUser(user.uid, walletId);
-      toast.success("Wallet deleted successfully");
+      const deleted = await deleteWalletFromUser(user.uid, walletId);
+      if (deleted) {
+        toast.success("Wallet deleted successfully");
+      }
     } catch (error) {
       console.error('Delete wallet error:', error);
       throw error;
