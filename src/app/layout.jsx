@@ -1,5 +1,5 @@
 import './globals.css';
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from 'sonner';
 import { AuthProvider } from '@/hooks/use-auth';
 import { Inter, Lexend } from 'next/font/google';
 

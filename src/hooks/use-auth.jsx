@@ -2,14 +2,12 @@
 
 import { useState, useEffect, createContext, useContext } from 'react';
 import { 
-  signInWithPopup, 
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  EmailAuthProvider,
-  reauthenticateWithCredential
+  GoogleAuthProvider, 
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut 
 } from 'firebase/auth';
+import { toast } from 'sonner'; // Change from react-toastify to sonner
 import { auth } from '@/lib/firebase';
 import { 
   createUserDocument, 
@@ -17,7 +15,6 @@ import {
   deleteWalletFromUser,
   subscribeToWallets 
 } from '@/lib/firebase-service';
-import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
@@ -109,16 +106,11 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const deleted = await deleteWalletFromUser(user.uid, walletId);
-      if (deleted) {
-        // The UI will update automatically through the subscription
-        toast.success("Wallet deleted successfully");
-      }
+      await deleteWalletFromUser(user.uid, walletId);
+      toast.success("Wallet deleted successfully");
     } catch (error) {
       console.error('Delete wallet error:', error);
-      toast.error("Failed to delete wallet", {
-        description: error.message || "Please try again"
-      });
+      toast.error("Failed to delete wallet");
       throw error;
     }
   };
