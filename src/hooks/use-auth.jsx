@@ -9,7 +9,12 @@ import {
   signOut 
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { createUserDocument, getUserWallets } from '@/lib/firebase-service';
+import { 
+  createUserDocument, 
+  addWalletToUser, 
+  deleteWalletFromUser,
+  subscribeToWallets 
+} from '@/lib/firebase-service';
 
 const AuthContext = createContext();
 
@@ -19,20 +24,32 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+    let unsubscribeWallets = null;
+
+    const unsubscribeAuth = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         await createUserDocument(firebaseUser);
-        const userWallets = await getUserWallets(firebaseUser.uid);
-        setWallets(userWallets);
         setUser(firebaseUser);
+        
+        unsubscribeWallets = subscribeToWallets(firebaseUser.uid, (updatedWallets) => {
+          setWallets(updatedWallets);
+        });
       } else {
         setUser(null);
         setWallets([]);
+        if (unsubscribeWallets) {
+          unsubscribeWallets();
+        }
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeWallets) {
+        unsubscribeWallets();
+      }
+    };
   }, []);
 
   const signup = async (email, password) => {
@@ -73,16 +90,24 @@ export function AuthProvider({ children }) {
   const addWallet = async (walletData) => {
     if (!user) return;
     
-    const newWallet = await addWallet(user.uid, walletData);
-    setWallets([...wallets, newWallet]);
-    return newWallet;
+    try {
+      const newWallet = await addWalletToUser(user.uid, walletData);
+      return newWallet;
+    } catch (error) {
+      console.error('Error adding wallet:', error);
+      throw error;
+    }
   };
 
   const deleteWallet = async (walletId) => {
     if (!user) return;
     
-    await deleteWallet(user.uid, walletId);
-    setWallets(wallets.filter(w => w.id !== walletId));
+    try {
+      await deleteWalletFromUser(user.uid, walletId);
+    } catch (error) {
+      console.error('Error deleting wallet:', error);
+      throw error;
+    }
   };
 
   const value = {
