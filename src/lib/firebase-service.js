@@ -61,14 +61,18 @@ export async function deleteWalletFromUser(userId, walletId) {
     }
 
     const walletRef = doc(db, 'users', userId, 'wallets', walletId);
-    
-    
     const walletSnap = await getDoc(walletRef);
+    
     if (!walletSnap.exists()) {
       throw new Error('Wallet not found');
     }
 
     await deleteDoc(walletRef);
+    
+    const verifySnap = await getDoc(walletRef);
+    if (verifySnap.exists()) {
+      throw new Error('Failed to delete wallet');
+    }
     
     return true;
   } catch (error) {

@@ -113,7 +113,7 @@ export default function WalletManager() {
     setVisiblePrivateKey(visiblePrivateKey === id ? null : id);
   };
 
-  const handleDeleteWallet = async (wallet) => {
+  const handleDeleteWallet = (wallet) => {
     setWalletToDelete(wallet);
   };
 
@@ -122,15 +122,8 @@ export default function WalletManager() {
 
     setIsDeleting(true);
     try {
-      const isValid = await verifyPassword(deletePassword);
-      if (!isValid) {
-        toast.error("Invalid password");
-        return;
-      }
-
       await deleteWallet(walletToDelete.id);
       setWalletToDelete(null);
-      setDeletePassword("");
     } catch (error) {
       toast.error("Failed to delete wallet", {
         description: error.message || "Please try again",
@@ -300,24 +293,15 @@ export default function WalletManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Wallet</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Please enter your password to confirm deletion.
+              Are you sure you want to delete this wallet? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
-            <Input
-              type="password"
-              placeholder="Enter your password"
-              value={deletePassword}
-              onChange={(e) => setDeletePassword(e.target.value)}
-              className="w-full"
-            />
-          </div>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={confirmDelete}
-              disabled={!deletePassword || isDeleting}
+              disabled={isDeleting}
             >
               {isDeleting ? (
                 <>
