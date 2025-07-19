@@ -1,15 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,7 +11,6 @@ import { toast } from "sonner";
 import { generateMnemonic, deriveWallets } from "@/lib/crypto";
 import { Copy, Hexagon, Waves, PlusCircle, KeyRound, Eye, EyeOff, Save, AlertTriangle, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function WalletManager() {
@@ -29,11 +20,8 @@ export default function WalletManager() {
   const [visiblePrivateKey, setVisiblePrivateKey] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [walletToDelete, setWalletToDelete] = useState(null);
-  const [deletePassword, setDeletePassword] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const { addWallet, deleteWallet, verifyPassword } = useAuth();
+  const { addWallet } = useAuth();
 
   const handleCopyToClipboard = (text, label) => {
     navigator.clipboard.writeText(text);
@@ -111,26 +99,6 @@ export default function WalletManager() {
 
   const togglePrivateKeyVisibility = (id) => {
     setVisiblePrivateKey(visiblePrivateKey === id ? null : id);
-  };
-
-  const handleDeleteWallet = (wallet) => {
-    setWalletToDelete(wallet);
-  };
-
-  const confirmDelete = async () => {
-    if (!walletToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      await deleteWallet(walletToDelete.id);
-      setWalletToDelete(null);
-    } catch (error) {
-      toast.error("Failed to delete wallet", {
-        description: error.message || "Please try again",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
   };
 
   const ChainSelector = (
@@ -269,15 +237,6 @@ export default function WalletManager() {
                           <span className="sr-only">Save Wallet</span>
                           <Save className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteWallet(wallet)}
-                          title="Delete Wallet"
-                        >
-                          <span className="sr-only">Delete Wallet</span>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -287,34 +246,6 @@ export default function WalletManager() {
           </div>
         </div>
       )}
-
-      <AlertDialog open={!!walletToDelete} onOpenChange={() => setWalletToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Wallet</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this wallet? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete Wallet"
-              )}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

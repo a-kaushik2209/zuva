@@ -4,10 +4,12 @@ import {
   getDoc, 
   setDoc, 
   collection, 
+  query, 
+  where, 
   getDocs,
   deleteDoc,
   addDoc,
-  onSnapshot 
+  updateDoc 
 } from 'firebase/firestore';
 
 export async function createUserDocument(user) {
@@ -35,73 +37,21 @@ export async function getUserWallets(userId) {
   }));
 }
 
-export async function addWalletToUser(userId, walletData) {
-  try {
-    const walletsRef = collection(db, 'users', userId, 'wallets');
-    const newWallet = {
-      ...walletData,
-      createdAt: new Date().toISOString()
-    };
-    
-    const docRef = await addDoc(walletsRef, newWallet);
-    return {
-      id: docRef.id,
-      ...newWallet
-    };
-  } catch (error) {
-    console.error('Error adding wallet:', error);
-    throw error;
-  }
-}
-
-export async function deleteWalletFromUser(userId, walletId) {
-  try {
-    if (!userId || !walletId) {
-      throw new Error('User ID and Wallet ID are required');
-    }
-
-    const walletRef = doc(db, 'users', userId, 'wallets', walletId);
-    const walletSnap = await getDoc(walletRef);
-    
-    if (!walletSnap.exists()) {
-      throw new Error('Wallet not found');
-    }
-
-    await deleteDoc(walletRef);
-    
-    const verifySnap = await getDoc(walletRef);
-    if (verifySnap.exists()) {
-      throw new Error('Failed to delete wallet');
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error deleting wallet:', error);
-    throw error;
-  }
-}
-
-export function subscribeToWallets(userId, callback) {
-  if (!userId) return () => {};
-
+export async function addWallet(userId, walletData) {
   const walletsRef = collection(db, 'users', userId, 'wallets');
+  const newWallet = {
+    ...walletData,
+    createdAt: new Date().toISOString()
+  };
   
-  const unsubscribe = onSnapshot(
-    walletsRef,
-    (snapshot) => {
-      const wallets = snapshot.docs
-        .filter(doc => doc.exists())
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-      callback(wallets);
-    },
-    (error) => {
-      console.error('Error in wallet subscription:', error);
-      callback([]);
-    }
-  );
+  const docRef = await addDoc(walletsRef, newWallet);
+  return {
+    id: docRef.id,
+    ...newWallet
+  };
+}
 
-  return unsubscribe;
+export async function deleteWallet(userId, walletId) {
+  const walletRef = doc(db, 'users', userId, 'wallets', walletId);
+  await deleteDoc(walletRef);
 }

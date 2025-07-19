@@ -2,19 +2,14 @@
 
 import { useState, useEffect, createContext, useContext } from 'react';
 import { 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  onAuthStateChanged,
+  signInWithPopup, 
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut 
 } from 'firebase/auth';
-import { toast } from 'sonner';
 import { auth } from '@/lib/firebase';
-import { 
-  createUserDocument, 
-  addWalletToUser, 
-  deleteWalletFromUser,
-  subscribeToWallets 
-} from '@/lib/firebase-service';
+import { createUserDocument, getUserWallets } from '@/lib/firebase-service';
 
 const AuthContext = createContext();
 
@@ -24,32 +19,20 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let unsubscribeWallets = null;
-
-    const unsubscribeAuth = auth.onAuthStateChanged(async (firebaseUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         await createUserDocument(firebaseUser);
+        const userWallets = await getUserWallets(firebaseUser.uid);
+        setWallets(userWallets);
         setUser(firebaseUser);
-        
-        unsubscribeWallets = subscribeToWallets(firebaseUser.uid, (updatedWallets) => {
-          setWallets(updatedWallets);
-        });
       } else {
         setUser(null);
         setWallets([]);
-        if (unsubscribeWallets) {
-          unsubscribeWallets();
-        }
       }
       setLoading(false);
     });
 
-    return () => {
-      unsubscribeAuth();
-      if (unsubscribeWallets) {
-        unsubscribeWallets();
-      }
-    };
+    return () => unsubscribe();
   }, []);
 
   const signup = async (email, password) => {
@@ -90,42 +73,16 @@ export function AuthProvider({ children }) {
   const addWallet = async (walletData) => {
     if (!user) return;
     
-    try {
-      const newWallet = await addWalletToUser(user.uid, walletData);
-      return newWallet;
-    } catch (error) {
-      console.error('Error adding wallet:', error);
-      throw error;
-    }
+    const newWallet = await addWallet(user.uid, walletData);
+    setWallets([...wallets, newWallet]);
+    return newWallet;
   };
 
   const deleteWallet = async (walletId) => {
-    if (!user) {
-      toast.error("No user logged in");
-      return;
-    }
-
-    try {
-      const deleted = await deleteWalletFromUser(user.uid, walletId);
-      if (deleted) {
-        toast.success("Wallet deleted successfully");
-      }
-    } catch (error) {
-      console.error('Delete wallet error:', error);
-      throw error;
-    }
-  };
-
-  const verifyPassword = async (password) => {
-    if (!user || user.isGoogleUser) return false;
-    try {
-      const credential = EmailAuthProvider.credential(user.email, password);
-      await reauthenticateWithCredential(user, credential);
-      return true;
-    } catch (error) {
-      console.error('Password verification failed:', error);
-      return false;
-    }
+    if (!user) return;
+    
+    await deleteWallet(user.uid, walletId);
+    setWallets(wallets.filter(w => w.id !== walletId));
   };
 
   const value = {
@@ -137,8 +94,7 @@ export function AuthProvider({ children }) {
     logout,
     signInWithGoogle,
     addWallet,
-    deleteWallet,
-    verifyPassword
+    deleteWallet
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

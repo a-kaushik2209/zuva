@@ -110,24 +110,16 @@ export default function DashboardPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
-    try {
-      const isValid = await verifyPassword(deletePassword);
-      
-      if (!isValid) {
-        toast.error("Incorrect Password", {
-          description: "The password you entered is incorrect.",
-        });
-        return;
-      }
-
-      await deleteWallet(walletToDelete.id);
-      
+  const handleDeleteConfirm = () => {
+    if (verifyPassword(deletePassword)) {
+      deleteWallet(walletToDelete.id);
+      toast.success("Wallet Deleted", {
+        description: `Wallet ${walletToDelete.publicKey.slice(0, 12)}... has been removed.`,
+      });
       resetDeleteDialogState();
-      
-    } catch (error) {
-      toast.error("Failed to delete wallet", {
-        description: error.message || "Please try again",
+    } else {
+      toast.error("Incorrect Password", {
+        description: "The password you entered is incorrect.",
       });
     }
   };
@@ -151,6 +143,7 @@ export default function DashboardPage() {
     <main className="flex min-h-screen flex-col items-center p-4 sm:p-6 lg:p-8 bg-background">
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
       <div className="w-full max-w-6xl">
+        {/* Header Section */}
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold font-headline tracking-tighter">Dashboard</h1>
