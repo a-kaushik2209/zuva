@@ -17,7 +17,6 @@ export function AuthProvider({ children }) {
   const [wallets, setWallets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Firebase Auth State Monitor
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
@@ -30,7 +29,6 @@ export function AuthProvider({ children }) {
       }
     });
 
-    // Check local storage for existing session
     try {
       const storedUser = localStorage.getItem('zuva-user');
       if (storedUser) {
@@ -47,7 +45,6 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  // Wallet Management Functions
   const loadWallets = (userEmail) => {
     try {
       const storedWallets = localStorage.getItem(`zuva-wallets-${userEmail}`);
@@ -58,11 +55,9 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Authentication Functions
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      // Add these options to handle popup behavior
       provider.setCustomParameters({
         prompt: 'select_account',
         popupType: 'center'
@@ -136,7 +131,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Wallet Functions
   const addWallet = (wallet) => {
     if (!user) return;
     

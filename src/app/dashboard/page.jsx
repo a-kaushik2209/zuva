@@ -117,13 +117,11 @@ export default function DashboardPage() {
     setVisiblePrivateKey(null);
   };
 
-  // Add handlers for copy operations
   const handleKeyboardCopy = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to Clipboard");
   };
 
-  // Add hotkeys for copying
   useHotkeys('ctrl+c', () => {
     if (selectedWallet) {
       const activeElement = document.activeElement;
@@ -133,7 +131,6 @@ export default function DashboardPage() {
     }
   });
 
-  // Add handler for delete dialog submission
   const handleDeleteKeySubmit = (e) => {
     if (e.key === 'Enter' && deleteConfirmText === 'confirm') {
       handleDeleteConfirm();
@@ -324,7 +321,6 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Wallet Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="sm:max-w-[500px] p-6">
           <AlertDialogHeader>

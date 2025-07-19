@@ -17,7 +17,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase only once
 let app;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -25,7 +24,6 @@ if (!getApps().length) {
   app = getApps()[0];
 }
 
-// Export auth and db instances
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
@@ -63,7 +61,6 @@ export function useAuth() {
   };
 }
 
-// In your login/signup pages
 const handleGoogleAuth = async () => {
   try {
     await signInWithGoogle();
