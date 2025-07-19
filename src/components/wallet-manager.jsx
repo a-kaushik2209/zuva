@@ -129,7 +129,6 @@ export default function WalletManager() {
       }
 
       await deleteWallet(walletToDelete.id);
-      toast.success("Wallet deleted successfully");
       setWalletToDelete(null);
       setDeletePassword("");
     } catch (error) {

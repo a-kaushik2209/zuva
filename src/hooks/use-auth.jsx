@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   signOut 
 } from 'firebase/auth';
-import { toast } from 'sonner'; // Change from react-toastify to sonner
+import { toast } from 'sonner';
 import { auth } from '@/lib/firebase';
 import { 
   createUserDocument, 
@@ -110,7 +110,6 @@ export function AuthProvider({ children }) {
       toast.success("Wallet deleted successfully");
     } catch (error) {
       console.error('Delete wallet error:', error);
-      toast.error("Failed to delete wallet");
       throw error;
     }
   };
@@ -118,7 +117,6 @@ export function AuthProvider({ children }) {
   const verifyPassword = async (password) => {
     if (!user || user.isGoogleUser) return false;
     try {
-      // For Firebase users, you might want to use reauthenticateWithCredential
       const credential = EmailAuthProvider.credential(user.email, password);
       await reauthenticateWithCredential(user, credential);
       return true;

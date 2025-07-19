@@ -62,10 +62,12 @@ export async function deleteWalletFromUser(userId, walletId) {
 
     const walletRef = doc(db, 'users', userId, 'wallets', walletId);
     
-    // Delete the document from Firestore
+    const walletSnap = await getDoc(walletRef);
+    if (!walletSnap.exists()) {
+      throw new Error('Wallet not found');
+    }
     await deleteDoc(walletRef);
     
-    // Return success only after confirmed deletion
     const checkDeleted = await getDoc(walletRef);
     if (checkDeleted.exists()) {
       throw new Error('Failed to delete wallet');
@@ -83,11 +85,9 @@ export function subscribeToWallets(userId, callback) {
 
   const walletsRef = collection(db, 'users', userId, 'wallets');
   
-  // Use unsubscribe to clean up the listener
   const unsubscribe = onSnapshot(
     walletsRef,
     (snapshot) => {
-      // Map only existing documents
       const wallets = snapshot.docs
         .filter(doc => doc.exists())
         .map(doc => ({
