@@ -61,13 +61,16 @@ export async function deleteWalletFromUser(userId, walletId) {
     }
 
     const walletRef = doc(db, 'users', userId, 'wallets', walletId);
-    const walletSnap = await getDoc(walletRef);
     
-    if (!walletSnap.exists()) {
-      throw new Error('Wallet not found');
-    }
-
+    // Delete the document from Firestore
     await deleteDoc(walletRef);
+    
+    // Return success only after confirmed deletion
+    const checkDeleted = await getDoc(walletRef);
+    if (checkDeleted.exists()) {
+      throw new Error('Failed to delete wallet');
+    }
+    
     return true;
   } catch (error) {
     console.error('Error deleting wallet:', error);
@@ -76,17 +79,28 @@ export async function deleteWalletFromUser(userId, walletId) {
 }
 
 export function subscribeToWallets(userId, callback) {
-  if (!userId) return () => {}; // Return empty cleanup function if no userId
+  if (!userId) return () => {};
 
   const walletsRef = collection(db, 'users', userId, 'wallets');
-  return onSnapshot(walletsRef, (snapshot) => {
-    const wallets = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    callback(wallets);
-  }, (error) => {
-    console.error('Error in wallet subscription:', error);
-    callback([]); // Return empty array on error
-  });
+  
+  // Use unsubscribe to clean up the listener
+  const unsubscribe = onSnapshot(
+    walletsRef,
+    (snapshot) => {
+      // Map only existing documents
+      const wallets = snapshot.docs
+        .filter(doc => doc.exists())
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+      callback(wallets);
+    },
+    (error) => {
+      console.error('Error in wallet subscription:', error);
+      callback([]);
+    }
+  );
+
+  return unsubscribe;
 }

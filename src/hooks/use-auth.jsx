@@ -17,6 +17,7 @@ import {
   deleteWalletFromUser,
   subscribeToWallets 
 } from '@/lib/firebase-service';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
@@ -102,12 +103,22 @@ export function AuthProvider({ children }) {
   };
 
   const deleteWallet = async (walletId) => {
-    if (!user) return;
-    
+    if (!user) {
+      toast.error("No user logged in");
+      return;
+    }
+
     try {
-      await deleteWalletFromUser(user.uid, walletId);
+      const deleted = await deleteWalletFromUser(user.uid, walletId);
+      if (deleted) {
+        // The UI will update automatically through the subscription
+        toast.success("Wallet deleted successfully");
+      }
     } catch (error) {
-      console.error('Error deleting wallet:', error);
+      console.error('Delete wallet error:', error);
+      toast.error("Failed to delete wallet", {
+        description: error.message || "Please try again"
+      });
       throw error;
     }
   };
